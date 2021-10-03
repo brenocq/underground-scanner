@@ -30,11 +30,11 @@ public:
     Node value;
     int set;
 
-    GraphNode(Node value, int group)
+    GraphNode(Node val, int group)
     {
-        value = value;
-        set = set;
-    };
+        value = val;
+        set = group;
+    }
 };
 
 class DisjointSet
