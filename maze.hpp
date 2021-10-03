@@ -8,7 +8,7 @@ using namespace std;
 
 struct Node
 {
-    vector<int> val = {};
+    vector<int> val;
 };
 
 struct Edge
@@ -36,7 +36,7 @@ public:
 class DisjointSet
 {
 public:
-    map<Node, GraphNode> nodeMapping = {};
+    map<Node, GraphNode> nodeMapping;
     DisjointSet(vector<Node> nodes);
     void joinSets(Node node1, Node node2);
 };
