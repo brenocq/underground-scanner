@@ -41,14 +41,14 @@ void Maze::generateMaze()
             allEdges.push_back(edge);
         }
     }
-    ds = DisjointSet(nodes);
+    DisjointSet ds = DisjointSet(nodes);
     while (edges.size() < (nodes.size() - 1))
     {
         Edge edge;
         int randIndex = rand() % (allEdges.size());
         edge = allEdges[randIndex];
         allEdges.erase(allEdges.begin() + randIndex);
-        if (ds.nodeMapping.at(edge.n1).set != ds.nodeMapping.at(edge.n2).set)
+        if (ds.nodeMapping.at(nodeToString(edge.n1)).set != ds.nodeMapping.at(nodeToString(edge.n2)).set)
         {
             ds.joinSets(edge.n1, edge.n2);
             edges.push_back(edge);
@@ -73,29 +73,6 @@ vector<Node> Maze::getNeighbours(Node node)
         }
     }
     return neighbours;
-}
-
-DisjointSet::DisjointSet(vector<Node> nodes)
-{
-    for (int i = 0; i < nodes.size(); i++)
-    {
-        GraphNode node = GraphNode(nodes[i], i);
-        nodeMapping.insert(pair<Node, GraphNode>(node.value, node));
-    }
-}
-
-void DisjointSet::joinSets(Node node1, Node node2)
-{
-    if (nodeMapping.at(node1).set != nodeMapping.at(node2).set)
-    {
-        nodeMapping.at(node1).set = nodeMapping.at(node2).set;
-    }
-}
-
-GraphNode::GraphNode(Node value, int set)
-{
-    value = value;
-    set = set;
 }
 
 // Debug
