@@ -112,4 +112,9 @@ int main()
 {
     Maze maze = Maze(7);
     printf("%ld\n", maze.edges.size());
+    for (int i = 0; i < maze.edges.size(); i++)
+    {
+        string aux = nodeToString(maze.edges[i].n1) + " -> " + nodeToString(maze.edges[i].n2);
+        cout << aux << "\n";
+    }
 }
