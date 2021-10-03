@@ -5,6 +5,38 @@
 
 using namespace std;
 
+string nodeToString(Node node)
+{
+    string str;
+    str = "(" + to_string(node.val[0]) + ", " + to_string(node.val[1]) + ", " + to_string(node.val[2]) + ")";
+    return str;
+}
+
+GraphNode::GraphNode(Node val, int group)
+{
+    value = val;
+    set = group;
+}
+
+DisjointSet::DisjointSet(vector<Node> nodes)
+{
+    for (int i = 0; i < nodes.size(); i++)
+    {
+        GraphNode node = GraphNode(nodes[i], i);
+        nodeMapping.insert(pair<string, GraphNode>(nodeToString(node.value), node));
+    }
+}
+
+void DisjointSet::joinSets(Node node1, Node node2)
+{
+    string str1 = nodeToString(node1);
+    string str2 = nodeToString(node2);
+    if (nodeMapping.at(str1).set != nodeMapping.at(str2).set)
+    {
+        nodeMapping.at(str1).set = nodeMapping.at(str2).set;
+    }
+};
+
 Maze::Maze(int size)
 {
 

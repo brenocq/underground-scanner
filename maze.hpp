@@ -11,30 +11,20 @@ struct Node
     vector<int> val;
 };
 // --------------------------------------
-string nodeToString(Node node)
-{
-    string str;
-    str = "(" + to_string(node.val[0]) + ", " + to_string(node.val[1]) + ", " + to_string(node.val[2]) + ")";
-    return str;
-}
-// --------------------------------------
 struct Edge
 {
     Node n1;
     Node n2;
 };
 // --------------------------------------
+string nodeToString(Node node);
+// --------------------------------------
 class GraphNode
 {
 public:
     Node value;
     int set;
-
-    GraphNode(Node val, int group)
-    {
-        value = val;
-        set = group;
-    }
+    GraphNode(Node val, int group);
 };
 // --------------------------------------
 class DisjointSet
@@ -42,24 +32,9 @@ class DisjointSet
 public:
     map<string, GraphNode> nodeMapping;
 
-    DisjointSet(vector<Node> nodes)
-    {
-        for (int i = 0; i < nodes.size(); i++)
-        {
-            GraphNode node = GraphNode(nodes[i], i);
-            nodeMapping.insert(pair<string, GraphNode>(nodeToString(node.value), node));
-        }
-    };
+    DisjointSet(vector<Node> nodes);
 
-    void joinSets(Node node1, Node node2)
-    {
-        string str1 = nodeToString(node1);
-        string str2 = nodeToString(node2);
-        if (nodeMapping.at(str1).set != nodeMapping.at(str2).set)
-        {
-            nodeMapping.at(str1).set = nodeMapping.at(str2).set;
-        }
-    };
+    void joinSets(Node node1, Node node2);
 };
 // --------------------------------------
 class Maze
