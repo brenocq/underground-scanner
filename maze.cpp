@@ -78,5 +78,6 @@ vector<Node> Maze::getNeighbours(Node node)
 // Debug
 int main()
 {
-    Maze(7);
+    Maze maze = Maze(7);
+    printf("%ld\n", maze.edges.size());
 }

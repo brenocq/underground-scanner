@@ -10,20 +10,20 @@ struct Node
 {
     vector<int> val;
 };
-
+// --------------------------------------
 string nodeToString(Node node)
 {
     string str;
     str = "(" + to_string(node.val[0]) + ", " + to_string(node.val[1]) + ", " + to_string(node.val[2]) + ")";
     return str;
 }
-
+// --------------------------------------
 struct Edge
 {
     Node n1;
     Node n2;
 };
-
+// --------------------------------------
 class GraphNode
 {
 public:
@@ -36,7 +36,7 @@ public:
         set = group;
     }
 };
-
+// --------------------------------------
 class DisjointSet
 {
 public:
@@ -61,20 +61,21 @@ public:
         }
     };
 };
-
+// --------------------------------------
 class Maze
 {
 private:
     int graphSize;
     vector<Node> nodes;
-    vector<Edge> edges;
     vector<Node> getNeighbours(Node node);
 
 public:
+    // Arestas do labirinto gerado
+    vector<Edge> edges;
     // Construtor da classe que gera o conjunto de nós
     Maze(int size);
     // Função que gera proceduralmente o labirinto 3D
     void generateMaze();
 };
-
+// --------------------------------------
 #endif
