@@ -55,7 +55,19 @@ Maze::Maze(int size)
             }
         }
     }
-    generateMaze();
+    generateMaze();s
+      
+    adjascencyMatrix = (unsigned int**) malloc(sizeof(unsigned int*) * graphSize);
+    for(int i = 0; i < graphSize; i++) {
+        adjascencyMatrix[i] = (unsigned int*) malloc(sizeof(unsigned int) * graphSize);
+    }
+
+    memset(adjascencyMatrix, 0, graphSize * graphSize);
+
+    for(int i = 0; i < edges.size(); i++) {
+        adjascencyMatrix[edges[i].n1.val[0] + edges[i].n1.val[1]*graphSize + edges[i].n1.val[2]*graphSize*graphSize]
+                        [edges[i].n2.val[0] + edges[i].n2.val[1]*graphSize + edges[i].n2.val[2]*graphSize*graphSize] = 1;
+    }
 }
 
 void Maze::generateMaze()
