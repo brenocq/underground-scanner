@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include "maze.hpp"
 
 using namespace std;
@@ -39,7 +41,6 @@ void DisjointSet::joinSets(Node node1, Node node2)
 
 Maze::Maze(int size)
 {
-
     graphSize = size;
 
     // Gera os nós do grafo
@@ -55,19 +56,17 @@ Maze::Maze(int size)
             }
         }
     }
-    generateMaze();s
-      
-    adjascencyMatrix = (unsigned int**) malloc(sizeof(unsigned int*) * graphSize);
-    for(int i = 0; i < graphSize; i++) {
-        adjascencyMatrix[i] = (unsigned int*) malloc(sizeof(unsigned int) * graphSize);
-    }
+    generateMaze();
+  
+    int aux[size*size*size][size*size*size];
 
-    memset(adjascencyMatrix, 0, graphSize * graphSize);
-
+    memset(aux, 0, graphSize*graphSize*graphSize);
     for(int i = 0; i < edges.size(); i++) {
-        adjascencyMatrix[edges[i].n1.val[0] + edges[i].n1.val[1]*graphSize + edges[i].n1.val[2]*graphSize*graphSize]
+        aux[edges[i].n1.val[0] + edges[i].n1.val[1]*graphSize + edges[i].n1.val[2]*graphSize*graphSize]
                         [edges[i].n2.val[0] + edges[i].n2.val[1]*graphSize + edges[i].n2.val[2]*graphSize*graphSize] = 1;
     }
+
+    adjascencyMatrix = aux;
 }
 
 void Maze::generateMaze()
@@ -129,4 +128,5 @@ int main()
         string aux = nodeToString(maze.edges[i].n1) + " -> " + nodeToString(maze.edges[i].n2);
         cout << aux << "\n";
     }
+
 }
