@@ -1,52 +1,27 @@
 #ifndef __MAZE
 #define __MAZE
-
-#include <iostream>
 #include <vector>
-#include <map>
-using namespace std;
+#include <stdint.h>
 
-struct Node
-{
-    vector<int> val = {};
-};
-
-struct Edge
-{
-    Node n1;
-    Node n2;
-};
+#define MAZE_NONE 0x00
+#define MAZE_OCCUPIED 0x01
+#define MAZE_SEARCH 0x02
 
 class Maze
 {
-private:
-    int graphSize;
-    vector<Node> nodes;
-    vector<Edge> edges;
-    DisjointSet ds;
-    vector<Node> getNeighbours(Node node);
-
 public:
-    // Construtor da classe que gera o conjunto de nós
-    Maze(int size);
-    // Função que gera proceduralmente o labirinto 3D
+    // Create cube matrix of specified size
+    Maze(unsigned size_);
+
+    uint8_t getNode(int x, int y, int z);
+    void resize(unsigned newSize);
     void generateMaze();
-};
+    unsigned size;
 
-class DisjointSet
-{
-public:
-    map<Node, GraphNode> nodeMapping = {};
-    DisjointSet(vector<Node> nodes);
-    void joinSets(Node node1, Node node2);
-};
+private:
+    // Set nodes as occupied
+    void occupySphere(float radius, float x, float y, float z);
 
-class GraphNode
-{
-public:
-    Node value;
-    int set;
-    GraphNode(Node value, int group);
+    std::vector<uint8_t> _nodes;
 };
-
 #endif
