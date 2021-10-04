@@ -9,6 +9,8 @@ public:
     void render();
 
 private:
+    void mazeGeneration();
+    void searchControl();
 };
 
 #endif

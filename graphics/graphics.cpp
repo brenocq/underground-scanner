@@ -2,7 +2,7 @@
 #include <iostream>
 
 Graphics::Graphics(const Maze& maze):
-    _maze(maze), _width(500), _height(500)
+    _maze(maze), _width(900), _height(900)
 {
     initGlfw();
     initOpenGL();
