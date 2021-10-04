@@ -1,27 +1,35 @@
 #include "maze.hpp"
 #include <math.h>
 
-Maze::Maze(unsigned size):
-    _size(size)
+Maze::Maze(unsigned size_):
+    size(size_)
 {
-    _nodes.resize(_size*_size*_size);
+    resize(size);
+}
 
+void Maze::resize(unsigned newSize)
+{
+    size = newSize;
+    _nodes.resize(size*size*size);
     // Set some nodes as occupied
     generateMaze();
 }
 
 void Maze::generateMaze()
 {
-    for(unsigned i = 0; i < _size*_size; i++)
-        _nodes[i] = true;
+    for(unsigned i = 0; i < _nodes.size(); i++)
+        _nodes[i] = MAZE_NONE;
 
-    occupySphere(3, 2, 2, 2);
-    occupySphere(2, _size-2, _size-2, _size-2);
+    for(unsigned i = 0; i < size*size; i++)
+        _nodes[i] = MAZE_OCCUPIED;
+
+    for(unsigned i = 0; i < size; i++)
+        occupySphere(rand()%size/3, rand()%size, rand()%size, rand()%size);
 }
 
 uint8_t Maze::getNode(int x, int y, int z)
 {
-    return _nodes[x + y * _size + z * (_size * _size)];
+    return _nodes[x + y * size + z * (size * size)];
 }
 
 void Maze::occupySphere(float radius, float x, float y, float z)
@@ -32,9 +40,9 @@ void Maze::occupySphere(float radius, float x, float y, float z)
     float sY = y;     // Position y
     float sZ = z;     // Position z
     unsigned i = 0;
-    for(unsigned z = 0; z < _size; z++)
-        for(unsigned y = 0; y < _size; y++)
-            for(unsigned x = 0; x < _size; x++)
+    for(unsigned z = 0; z < size; z++)
+        for(unsigned y = 0; y < size; y++)
+            for(unsigned x = 0; x < size; x++)
             {
                 float dx = x-sX;
                 float dy = y-sY;

@@ -11,49 +11,50 @@
 class Graphics
 {
 public:
-	Graphics(Maze& maze);
-	~Graphics();
+    Graphics(Maze& maze);
+    ~Graphics();
 
-	void run();
+    void run();
 
 private:
-	void initGlfw();
-	void initOpenGL();
-	void createVAOs();
+    void initGlfw();
+    void initOpenGL();
+    void createVAOs();
 
-	void render();
+    void render();
 
-	Maze& _maze;
+    Maze& _maze;
 
-	// Window
-	unsigned _width;
-	unsigned _height;
-	GLFWwindow* _window;
+    // Window
+    unsigned _width;
+    unsigned _height;
+    GLFWwindow* _window;
+    bool _moveWithMouse;
 
-	struct Point
-	{
-		float x;
-		float y;
-		float z;
-	};
+    struct Point
+    {
+        float x;
+        float y;
+        float z;
+    };
 
-	struct Line
-	{
-		Point p0;
-		Point p1;
-	};
+    struct Line
+    {
+        Point p0;
+        Point p1;
+    };
 
-	// OpenGL
-	Shader* _shader;
-	Camera _camera;
-	Shader* _maze_shader;
-        UserInterface _ui;
-	unsigned _pointVAO;
-	unsigned _lineVAO;
-	unsigned _cubeVAO;
+    // OpenGL
+    Shader* _shader;
+    Camera _camera;
+    Shader* _maze_shader;
+    UserInterface* _ui;
+    unsigned _pointVAO;
+    unsigned _lineVAO;
+    unsigned _cubeVAO;
 
-	std::vector<Point> _points;
-	std::vector<Line> _lines;
+    std::vector<Point> _points;
+    std::vector<Line> _lines;
 };
 
 #endif

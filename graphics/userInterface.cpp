@@ -6,8 +6,10 @@
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_internal.h>
 
-UserInterface::UserInterface()
+UserInterface::UserInterface(Maze& maze):
+    _maze(maze)
 {
+
 }
 
 void UserInterface::init()
@@ -34,7 +36,7 @@ void UserInterface::render()
         if(firstTime)
         {
             ImGui::SetNextWindowPos(ImVec2(0, 0));
-            ImGui::SetNextWindowSize(ImVec2(300, 900));
+            ImGui::SetNextWindowSize(ImVec2(300, 300));
         }
         ImGui::Begin("Control", &open);
         {
@@ -58,7 +60,7 @@ void UserInterface::render()
 
 void UserInterface::mazeGeneration()
 {
-    static int mazeSize = 7;
+    int mazeSize = (int)_maze.size;
     ImGui::Text("Maze generation");
     ImGui::Spacing();
     bool sizeChanged = ImGui::DragInt("Size", &mazeSize, 0.5f, 2, 100, "%d");
@@ -72,7 +74,8 @@ void UserInterface::mazeGeneration()
     ImGui::DragInt("X##GoalX", &goalX, 0.5f, 0, mazeSize-1, "%d");
     ImGui::DragInt("Y##GoalY", &goalY, 0.5f, 0, mazeSize-1, "%d");
     ImGui::DragInt("Z##GoalZ", &goalZ, 0.5f, 0, mazeSize-1, "%d");
-    ImGui::Button("Generate");
+    if(ImGui::Button("Regenerate"))
+        _maze.generateMaze();
 
     // Check if need to update start/goal positions
     if(sizeChanged)
@@ -90,6 +93,8 @@ void UserInterface::mazeGeneration()
             goalY = mazeSize-1;
         if(goalZ >= mazeSize)
             goalZ = mazeSize-1;
+
+        _maze.resize(mazeSize);
     }
 }
 
