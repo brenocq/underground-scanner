@@ -279,17 +279,24 @@ void Graphics::render()
             for (uint32_t x = 0 ; x < _maze.size; x++)
             {
                 uint8_t a_node = _maze.getNode(x, y, z);
-                if(a_node == 0)
+                
+		if(a_node == 0)
                     continue;
 
                 glm::vec4 color = glm::vec4(0.0, 0.0, 0.0, 0.0);
 
 
                 // Set color uniform based on vertex info
-                if(a_node & MAZE_OCCUPIED) 
+                if(a_node & MAZE_OCCUPIED)
                     color = glm::vec4(x/(float)_maze.size, y/(float)_maze.size, z/(float)_maze.size, 1.0);
 
-                _maze_shader->setUniformV4("color", color);
+                if(a_node & MAZE_VISITED)
+                    color = glm::vec4(0.5, 1.0, 0.83, 1.0);
+
+                if(a_node & MAZE_SEARCH) // Scarlet the passion, the color of my heart
+                    color = glm::vec4(1.0, 0.14, 0.0, 1.0);
+
+		_maze_shader->setUniformV4("color", color);
 
                 // Set model matrix
                 glm::mat4 model = glm::mat4(1.0);

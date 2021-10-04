@@ -102,13 +102,41 @@ void UserInterface::searchControl()
 {
     ImGui::Text("Search control");
 
+    static int searchState = 0;
+
     // Select search combo box
     const char* typesOfSearch[] = { "Unguided search", "A* (Guided search)" };
-    int selected = 0;
+    static int selected = 0;
     ImGui::Combo("Type", &selected, typesOfSearch, IM_ARRAYSIZE(typesOfSearch));
 
     // Buttons
-    ImGui::Button("Reset");
+    if(ImGui::Button("Reset"))
+    {
+	_maze.setTarget(goalX, goalY, goalZ);
+	_maze.setStart(startX, startY, startZ);
+	
+	if (selected == 0)
+	{
+	    _maze.initBFS();
+	}
+    }
+    
     ImGui::SameLine();
-    ImGui::Button("Advance");
+    
+    if(ImGui::Button("Next"))
+    {
+	if (selected == 0)
+	{
+	    if (searchState == 0)
+	    {
+	        _maze.beginIterBFS();
+		searchState = 1;
+	    }
+
+	    if (searchState == 1)
+	    {
+		_maze.endIterBFS();
+	    }
+	}
+    }
 }

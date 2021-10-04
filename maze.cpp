@@ -1,6 +1,6 @@
 #include "maze.hpp"
 #include <math.h>
-
+#include <stdio.h>
 Maze::Maze(unsigned size_):
     size(size_)
 {
@@ -13,6 +13,88 @@ void Maze::resize(unsigned newSize)
     _nodes.resize(size*size*size);
     // Set some nodes as occupied
     generateMaze();
+}
+
+void Maze::setTarget(int x, int y, int z)
+{
+    _target = {x, y, z};
+}
+
+void Maze::setStart(int x, int y, int z)
+{
+    _start = {x, y, z};
+}
+
+void Maze::initBFS()
+{
+    found = false;
+    _bfs_search = _start;
+    _bfs_queue.push(_bfs_search);
+}
+
+void Maze::beginIterBFS()
+{
+    if (found) return;
+
+    Pos next_node = _bfs_queue.front();
+
+    int x = next_node.x;
+    int y = next_node.y;
+    int z = next_node.z;
+
+    printf("searching %d %d %d", x, y, z);
+
+    _nodes[x + y * size + z * (size * size)] = MAZE_SEARCH;
+
+    // Fill queue with adjacent nodes
+    for (int i = x-1 ; i <= x+1 ; ++i)
+    for (int j = y-1 ; j <= y+1 ; ++j)
+    for (int k = z-1 ; i <= z+1 ; ++k)
+    {
+	tryInsertBFS(i, j, k);
+    }
+}
+
+void Maze::tryInsertBFS(int x, int y, int z)
+{
+    // Check bounds
+    if (x >= 0 && x < size &&
+	y >= 0 && y < size &&
+        z >= 0 && z < size)
+
+    if (!(getNode(x,y,z) & (MAZE_VISITED | MAZE_OCCUPIED)))
+    {
+	_bfs_queue.push({x, y, z});
+	printf("Inserted %d %d %d", x, y, z);
+    }
+}
+
+void Maze::endIterBFS()
+{
+    Pos next_node = _bfs_queue.front();
+    _bfs_queue.pop();
+
+    int x = next_node.x;
+    int y = next_node.y;
+    int z = next_node.z;
+
+    _nodes[x + y * size + z * (size * size)] = MAZE_VISITED;
+
+    // If target, return
+    if (x == _target.x &&
+	y == _target.y &&
+	z == _target.z)
+	found = true;
+}
+
+void Maze::initAstar()
+{
+
+}
+
+void Maze::iterAstar()
+{
+
 }
 
 void Maze::generateMaze()

@@ -3,5 +3,5 @@ FILES_IMGUI =$(patsubst %, extern/imgui/%, ${FILES_IMGUI_})
 FILES_GFX = graphics/graphics.cpp graphics/shader.cpp graphics/camera.cpp graphics/userInterface.cpp
 
 run:
-	g++ main.cpp maze.cpp ${FILES_GFX} extern/glad/glad.c ${FILES_IMGUI} -lglfw -lGL -lX11 -lXrandr -lXi -ldl -I. -I./extern/ -g -Wall -o maze
+	g++ main.cpp maze.cpp ${FILES_GFX} extern/glad/glad.c ${FILES_IMGUI} -lglfw -lGL -lX11 -lXrandr -lXi -ldl -I. -I./extern/ -g -Wall -fsanitize=address -o maze
 	./maze
