@@ -46,9 +46,10 @@ private:
 
 public:
     // Arestas do labirinto gerado
-    vector<Edge> edges;  
+    vector<Edge> edges;
+    // 0-> Caminho Ocupado
     // 1-> Caminho Livre
-    unsigned int ** adjascencyMatrix;
+    int** adjascencyMatrix;
     // Construtor da classe que gera o conjunto de nós
     Maze(int size);
     // Função que gera proceduralmente o labirinto 3D
