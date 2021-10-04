@@ -4,7 +4,7 @@
 class UserInterface
 {
 public:
-	UserInterface();
+    UserInterface();
     void init();
     void render();
 

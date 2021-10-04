@@ -41,7 +41,7 @@ void Maze::occupySphere(float radius, float x, float y, float z)
                 float dz = z-sZ;
                 float dist = sqrt(dx*dx + dy*dy + dz*dz);
                 if(dist < r)
-                    _nodes[i] |= MAZE_OCCUPIED;
+                    _nodes[i] = MAZE_OCCUPIED;
                 i++;
             }
 }

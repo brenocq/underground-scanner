@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/geometric.hpp>
 
+#include <stdio.h>
+
 Camera::Camera()
 {
 
@@ -29,12 +31,14 @@ glm::mat4 Camera::getViewProjectionMatrix()
 
     cam_x = rho * cos(phi) * sin(theta);
     cam_y = rho * sin(phi) * sin(theta);
-    cam_z = rho * sin(theta);
+    cam_z = rho * cos(theta);
 
     glm::mat4 ret;
 
     glm::vec3 cameraPos = glm::vec3(cam_x, cam_y, cam_z);
     glm::vec3 cameraDirection = glm::normalize(cameraPos);
+
+    printf("Camera position %f %f %f\n", cam_x, cam_y, cam_z);
 
     glm::vec3 up = glm::vec3(0.0, 1.0, 0.0);
     glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
@@ -42,7 +46,7 @@ glm::mat4 Camera::getViewProjectionMatrix()
     glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
 
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos - cameraDirection, cameraUp);
-    glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)800 / (float)600, 0.1f, 1000.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)900/ (float)900, 0.1f, 1000.0f);
 
     ret = projection * view;
 

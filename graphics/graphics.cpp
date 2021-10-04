@@ -69,33 +69,41 @@ void Graphics::initGlfw()
     //---------- Callbacks ----------//
     glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
     {
-        if(key == 'N' && action == GLFW_PRESS)
+	Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
+
+        if(key == 'N' && action != GLFW_RELEASE)
         {
             std::cout << "N pressed\n";
         }
 
-	if(key == 'W' && action == GLFW_PRESS)
+	if(key == 'W' && action != GLFW_RELEASE)
         {
+	    gptr->_camera.rotateDirection(0.1f, true);
         }
 
-        if(key == 'S' && action == GLFW_PRESS)
+        if(key == 'S' && action != GLFW_RELEASE)
         {
+	    gptr->_camera.rotateDirection(-0.1f, true);
         }
 
-        if(key == 'A' && action == GLFW_PRESS)
+        if(key == 'A' && action != GLFW_RELEASE)
         {
+	    gptr->_camera.rotateDirection(0.1f, false);
         }
 
-        if(key == 'D' && action == GLFW_PRESS)
+        if(key == 'D' && action != GLFW_RELEASE)
         {
+	    gptr->_camera.rotateDirection(-0.1f, false);
         }
 
-        if(key == 'Q' && action == GLFW_PRESS)
+        if(key == 'Q' && action != GLFW_RELEASE)
         {
+	    gptr->_camera.zoom(0.1f);
         }
 
-        if(key == 'E' && action == GLFW_PRESS)
+        if(key == 'E' && action != GLFW_RELEASE)
         {
+	    gptr->_camera.zoom(-0.1f);
         }
     });
 }
@@ -108,6 +116,11 @@ void Graphics::initOpenGL()
         std::cout << "[Graphics] Failed to initialize glad!" << std::endl;
         exit(0);
     }
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glDisable(GL_CULL_FACE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glViewport(0, 0, _width, _height);
     glLineWidth(2.0f);
@@ -202,7 +215,7 @@ void Graphics::createVAOs()
 void Graphics::render()
 {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     _shader->bind();
 
@@ -228,7 +241,7 @@ void Graphics::render()
         // Set color uniform based on vertex info
 
 	if (a_node & MAZE_OCCUPIED) 
-	    color = glm::vec4(1.0, 0.0, 0.0, 0.3);
+	    color = glm::vec4(1.0, 0.0, 0.0, 1.0);
 
 	_maze_shader->setUniformV4("color", color);
         
