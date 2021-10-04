@@ -5,6 +5,7 @@
 #include "glad/glad.h"// Glad para usar funções do OpenGL
 #include "maze.hpp"
 #include "graphics/shader.hpp"
+#include "graphics/userInterface.hpp"
 
 class Graphics
 {
@@ -43,6 +44,7 @@ private:
 
 	// OpenGL
 	Shader* _shader;
+    UserInterface _ui;
 	unsigned _pointVAO;
 	unsigned _lineVAO;
 	std::vector<Point> _points;

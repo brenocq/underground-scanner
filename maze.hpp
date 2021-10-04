@@ -2,51 +2,18 @@
 #define __MAZE
 #include <vector>
 
-struct Node
-{
-	float x;
-	float y;
-	float z;
-};
-
-struct Edge
-{
-    Node* n1;
-    Node* n2;
-};
-
 class Maze
 {
 public:
-    // Construtor da classe que gera o conjunto de nós
-    Maze(int size);
+    // Create cube matrix of specified size
+    Maze(unsigned size);
 
 private:
-    // Função que gera proceduralmente o labirinto 3D
+	// Set nodes as occupied
     void generateMaze();
+    void occupySphere(float radius, float x, float y, float z);
 
-	int graphSize;
-	std::vector<Node> nodes;
-    std::vector<Edge> edges;
-    //DisjointSet ds;
-	//std::vector<Node> getNeighbours(Node node);
-	
+	unsigned _size;
+	std::vector<bool> _nodes;
 };
-
-//class DisjointSet
-//{
-//public:
-//    map<Node, GraphNode> nodeMapping = {};
-//    DisjointSet(vector<Node> nodes);
-//    void joinSets(Node node1, Node node2);
-//};
-
-//class GraphNode
-//{
-//public:
-//    Node value;
-//    int set;
-//    GraphNode(Node value, int group);
-//};
-
 #endif
