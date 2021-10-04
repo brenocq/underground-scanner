@@ -6,11 +6,12 @@
 #include "maze.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/userInterface.hpp"
+#include "camera.hpp"
 
 class Graphics
 {
 public:
-	Graphics(const Maze& maze);
+	Graphics(Maze& maze);
 	~Graphics();
 
 	void run();
@@ -22,7 +23,7 @@ private:
 
 	void render();
 
-	const Maze& _maze;
+	Maze& _maze;
 
 	// Window
 	unsigned _width;
@@ -44,9 +45,13 @@ private:
 
 	// OpenGL
 	Shader* _shader;
-    UserInterface _ui;
+	Camera _camera;
+	Shader* _maze_shader;
+        UserInterface _ui;
 	unsigned _pointVAO;
 	unsigned _lineVAO;
+	unsigned _cubeVAO;
+
 	std::vector<Point> _points;
 	std::vector<Line> _lines;
 };

@@ -19,13 +19,18 @@ void Maze::generateMaze()
     occupySphere(2, _size-2, _size-2, _size-2);
 }
 
+uint8_t Maze::getNode(int x, int y, int z)
+{
+    return _nodes[x + y * _size + z * (_size * _size)];
+}
+
 void Maze::occupySphere(float radius, float x, float y, float z)
 {
     // Draw sphere
-    float r = radius;// Radius
-    float sX = x;// Position x
-    float sY = y;// Position y
-    float sZ = z;// Position z
+    float r = radius; // Radius
+    float sX = x;     // Position x
+    float sY = y;     // Position y
+    float sZ = z;     // Position z
     unsigned i = 0;
     for(unsigned z = 0; z < _size; z++)
         for(unsigned y = 0; y < _size; y++)
@@ -36,7 +41,8 @@ void Maze::occupySphere(float radius, float x, float y, float z)
                 float dz = z-sZ;
                 float dist = sqrt(dx*dx + dy*dy + dz*dz);
                 if(dist < r)
-                    _nodes[i] = true;
+                    _nodes[i] |= MAZE_OCCUPIED;
                 i++;
             }
 }
+

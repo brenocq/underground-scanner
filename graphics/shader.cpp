@@ -2,6 +2,9 @@
 #include <iostream>
 #include <fstream>
 
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
+
 Shader::Shader(fs::path vertShader, fs::path fragShader)
 {
 	unsigned vertId = compile(vertShader, GL_VERTEX_SHADER);
@@ -81,3 +84,17 @@ void Shader::link(unsigned vertId, unsigned fragId)
 	glDeleteShader(vertId);
 	glDeleteShader(fragId);
 }
+
+void Shader::setUniformV4(const char* uniformName, glm::vec4 value)
+{
+    int uniform_loc = glGetUniformLocation(_id, uniformName);
+    glUniform4f(uniform_loc, value.x, value.y, value.z, value.w);
+}
+
+void Shader::setUniformM4(const char* uniformName, glm::mat4 value)
+{
+    int uniform_loc = glGetUniformLocation(_id, uniformName);
+    glUniformMatrix4fv(uniform_loc, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+

@@ -1,14 +1,18 @@
 #include "graphics/graphics.hpp"
+#include "camera.hpp"
 #include <iostream>
 
-Graphics::Graphics(const Maze& maze):
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+Graphics::Graphics(Maze& maze):
     _maze(maze), _width(900), _height(900)
 {
     initGlfw();
     initOpenGL();
 
     _shader = new Shader("graphics/shaders/shader.vert", "graphics/shaders/shader.frag");
-    _shader->bind();
+    _maze_shader = new Shader("graphics/shaders/maze_shader.vert", "graphics/shaders/shader.frag");
 
     _lines.push_back({{0,0,0}, {1,1,1}});
     _lines.push_back({{1,1,1}, {1,1,0}});
@@ -69,6 +73,30 @@ void Graphics::initGlfw()
         {
             std::cout << "N pressed\n";
         }
+
+	if(key == 'W' && action == GLFW_PRESS)
+        {
+        }
+
+        if(key == 'S' && action == GLFW_PRESS)
+        {
+        }
+
+        if(key == 'A' && action == GLFW_PRESS)
+        {
+        }
+
+        if(key == 'D' && action == GLFW_PRESS)
+        {
+        }
+
+        if(key == 'Q' && action == GLFW_PRESS)
+        {
+        }
+
+        if(key == 'E' && action == GLFW_PRESS)
+        {
+        }
     });
 }
 
@@ -111,15 +139,72 @@ void Graphics::createVAOs()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Unbind objects
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-    glBindVertexArray(0); 
+	//----- Create cube VAO -----//
+    float cubeVertexData[] = {
+	    -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+
+            -0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+
+            -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
+
+            -0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+	};
+
+	glGenVertexArrays(1, &_cubeVAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(_cubeVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertexData), cubeVertexData, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Unbind objects
+	glBindBuffer(GL_ARRAY_BUFFER, 0); 
+	glBindVertexArray(0); 
 }
 
 void Graphics::render()
 {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    _shader->bind();
 
     // Draw lines
     glBindVertexArray(_lineVAO);
@@ -128,4 +213,37 @@ void Graphics::render()
     // Draw points
     glBindVertexArray(_pointVAO);
     glDrawArrays(GL_POINTS, 0, _points.size());
+
+    _maze_shader->bind();
+
+    // Rendering labyrinth
+    for (uint32_t z = 0 ; z < _maze._size; z++)
+    for (uint32_t y = 0 ; y < _maze._size; y++)
+    for (uint32_t x = 0 ; x < _maze._size; x++)
+    {
+	uint8_t a_node = _maze.getNode(x, y, z);
+
+	glm::vec4 color = glm::vec4(0.0, 0.0, 0.0, 0.0);
+
+        // Set color uniform based on vertex info
+
+	if (a_node & MAZE_OCCUPIED) 
+	    color = glm::vec4(1.0, 0.0, 0.0, 0.3);
+
+	_maze_shader->setUniformV4("color", color);
+        
+	// Set model matrix
+	glm::mat4 model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3((float)x, (float)y, (float)z));
+
+	glm::mat4 view_projection = _camera.getViewProjectionMatrix();
+
+	_maze_shader->setUniformM4("model", model);
+	_maze_shader->setUniformM4("viewProjection", view_projection);
+
+    	// Draw points
+	glBindVertexArray(_cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+    }
 }
+
