@@ -56,17 +56,33 @@ Maze::Maze(int size)
             }
         }
     }
+
     generateMaze();
   
-    int aux[size*size*size][size*size*size];
+    fill(adjascencyMatrix.begin(), adjascencyMatrix.end(), 0);
 
-    memset(aux, 0, graphSize*graphSize*graphSize);
     for(int i = 0; i < edges.size(); i++) {
-        aux[edges[i].n1.val[0] + edges[i].n1.val[1]*graphSize + edges[i].n1.val[2]*graphSize*graphSize]
-                        [edges[i].n2.val[0] + edges[i].n2.val[1]*graphSize + edges[i].n2.val[2]*graphSize*graphSize] = 1;
+        adjascencyMatrix[nodeToIndex(edges[i].n1)][nodeToIndex(edges[i].n2)];
+        adjascencyMatrix[nodeToIndex(edges[i].n2)][nodeToIndex(edges[i].n1)];
     }
 
-    adjascencyMatrix = aux;
+    adjascencyMatrix;
+}
+
+int Maze::nodeToIndex(Node n) {
+
+    return (n.val[0] + n.val[1]*graphSize + n.val[2]*graphSize*graphSize);
+}
+
+Node Maze::indexToNode(int i) {
+    Node n;
+    n.val.push_back((int) i/(graphSize*graphSize));
+    i -= n.val[0]*graphSize*graphSize;
+    n.val.push_back((int) i/(graphSize));
+    i -= n.val[0]*graphSize;
+    n.val.push_back(i);
+
+    return n;
 }
 
 void Maze::generateMaze()
