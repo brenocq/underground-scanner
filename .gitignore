@@ -1,3 +1,4 @@
 maze
 .gdb_history
 imgui.ini
+obj/*.o

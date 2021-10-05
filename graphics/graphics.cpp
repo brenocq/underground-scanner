@@ -70,22 +70,22 @@ void Graphics::initGlfw()
 
     //---------- Callbacks ----------//
     glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-            {
+        {
             Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
 
             if(key == 'N' && action != GLFW_RELEASE)
             {
-            std::cout << "N pressed\n";
+                std::cout << "N pressed\n";
             }
 
             if(key == 'W' && action != GLFW_RELEASE)
             {
-            gptr->_camera.rotateDirection(-0.1f, true);
+                gptr->_camera.rotateDirection(-0.1f, true);
             }
 
             if(key == 'S' && action != GLFW_RELEASE)
             {
-            gptr->_camera.rotateDirection(0.1f, true);
+                gptr->_camera.rotateDirection(0.1f, true);
             }
 
             if(key == 'A' && action != GLFW_RELEASE)
@@ -107,29 +107,29 @@ void Graphics::initGlfw()
             {
                 gptr->_camera.zoom(-0.1f);
             }
-            });
+        });
 
     glfwSetScrollCallback(_window, [](GLFWwindow* window, double dx, double dy)
-            {
+        {
             Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
 
             gptr->_camera.zoom(0.3f*dy);
-            });
+        });
 
     glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, int button, int action, int mods)
-            {
+        {
             Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
             if(button == 2)
             {
-            if(action == GLFW_PRESS)
-            gptr->_moveWithMouse = true;
-            else if(action == GLFW_RELEASE)
-            gptr->_moveWithMouse = false;
+                if(action == GLFW_PRESS)
+                    gptr->_moveWithMouse = true;
+                else if(action == GLFW_RELEASE)
+                    gptr->_moveWithMouse = false;
             }
-            });
+        });
 
     glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xPos, double yPos)
-            {
+        {
             static double lastX = -1;
             static double lastY = -1;
             if(lastX == -1) lastX = xPos;
@@ -145,10 +145,10 @@ void Graphics::initGlfw()
             // Update camera position
             if(gptr->_moveWithMouse)
             {
-            gptr->_camera.rotateDirection(0.01f*dx, false);// Theta
-            gptr->_camera.rotateDirection(0.01f*dy, true);// Phi
+                gptr->_camera.rotateDirection(0.01f*dx, false);// Theta
+                gptr->_camera.rotateDirection(0.01f*dy, true);// Phi
             }
-            });
+        });
 }
 
 void Graphics::initOpenGL()
