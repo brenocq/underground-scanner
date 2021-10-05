@@ -49,9 +49,11 @@ public:
     vector<Edge> edges;
     // 0-> Caminho Ocupado
     // 1-> Caminho Livre
-    int** adjascencyMatrix;
+    vector<vector<int> > adjascencyMatrix;
     // Construtor da classe que gera o conjunto de nós
     Maze(int size);
+    int nodeToIndex(Node n);
+    Node indexToNode(int i);
     // Função que gera proceduralmente o labirinto 3D
     void generateMaze();
 };
