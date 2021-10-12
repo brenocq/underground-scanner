@@ -132,6 +132,15 @@ void Maze::iterSearch()
     }
 }
 
+bool Maze::checkFound(Pos p)
+{
+    // If target, finish
+    if (p.x == _target.x &&
+        p.y == _target.y &&
+        p.z == _target.z)
+        _found = true;
+}
+
 //-------------------- BFS --------------------//
 void Maze::initBFS()
 {
@@ -168,19 +177,16 @@ void Maze::iterBFS()
             for (int k = z-1 ; k <= z+1 ; ++k)
                 tryInsertBFS(i, j, k);
 
-    // If target, finish
-    if (x == _target.x &&
-            y == _target.y &&
-            z == _target.z)
-        _found = true;
+    checkFound(next_node);
 }
 
+// TODO: change to Pos maybe
 void Maze::tryInsertBFS(int x, int y, int z)
 {
     // Check bounds
     if (x >= 0 && x < size &&
-            y >= 0 && y < size &&
-            z >= 0 && z < size)
+        y >= 0 && y < size &&
+        z >= 0 && z < size)
     {
         if (!(getNode(x,y,z) & (MAZE_VISITED | MAZE_OCCUPIED)))
         {
@@ -194,11 +200,38 @@ void Maze::tryInsertBFS(int x, int y, int z)
 //-------------------- A* --------------------//
 void Maze::initAstar()
 {
-
+    // Clear the pqueue
+    while (!_a_star_queue.empty())
+        _a_star_queue.pop();
+    _a_star_dist_from_start = 0;
 }
 
 void Maze::iterAstar()
 {
+    // Take from pqueue (check if empty and so on)
+    // check if we are in the target
+    // search distance is the Pos's distance +1
+    // insert nearby elements in the pqueue
+}
 
+bool heuristicAStar(const Pos& a, const Pos& b)
+{
+    // Use manhattan distance to specify the closest
+    int mnht_dist_a = 0;
+    mnht_dist_a += abs(a.x - _target.x);
+    mnht_dist_a += abs(a.y - _target.y);
+    mnht_dist_a += abs(a.z - _target.z);
+
+    int mnht_dist_b = 0;
+    mnht_dist_b += abs(b.x - _target.x);
+    mnht_dist_b += abs(b.y - _target.y);
+    mnht_dist_b += abs(b.z - _target.z);
+
+    // Priority queues return the greatest first,
+    // thus we need to invert the comparison operator
+    // to get the closest to the objective.
+    //TODO: implement g() heuristic (past)
+    if (mnht_dist_a < mnht_dist_b) return true;
+    return false;
 }
 

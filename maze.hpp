@@ -17,6 +17,7 @@ public:
     struct Pos
     {
         int x, y, z;
+	//int a_star_dist; // TODO: add comparison
     };
 
     enum class Search {
@@ -36,7 +37,7 @@ public:
 
     //---------- Getters and setters ----------//
     Search getSearch() const { return _search; }
-    void setSearch(Search search) { _search = search; }
+    void setSearch(Search search) { _search = search; initSearch(); }
     void setTarget(int x, int y, int z);
     void setStart(int x, int y, int z);
     Pos getStart() const { return _start; }
@@ -56,11 +57,17 @@ private:
     void tryInsertBFS(int x, int y, int z);
     void clearMazeSearch();
 
+    bool checkFound(Pos p);
+
     Search _search;
     bool _found;
     std::vector<uint8_t> _nodes;
     std::queue<Pos> _bfs_queue;
     Pos _start, _target, _bfs_search;
+
+    static bool heuristicAStar(const Pos& a, const Pos& b);
+    int _a_star_dist_from_start;
+    //std::priority_queue<Pos, std::vector<Pos>, &heuristicAStar> _a_star_queue;
 };
 #endif
 
