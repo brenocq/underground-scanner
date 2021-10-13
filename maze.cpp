@@ -1,7 +1,9 @@
 #include "maze.hpp"
 #include <math.h>
+#include <queue>
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 
 Maze::Maze(unsigned size_):
     size(size_), _search(Search::BFS), _start({0,0,0}), _target({size_-1,size_-1,size_-1})
@@ -10,14 +12,18 @@ Maze::Maze(unsigned size_):
     initSearch();
 }
 
-void Maze::setTarget(int x, int y, int z)
+bool Maze::setTarget(int x, int y, int z)
 {
+    if (_nodes[x + y * size + z * (size * size)] & MAZE_OCCUPIED) return true;
     _target = {x, y, z};
+    return false;
 }
 
-void Maze::setStart(int x, int y, int z)
+bool Maze::setStart(int x, int y, int z)
 {
+    if (_nodes[x + y * size + z * (size * size)] & MAZE_OCCUPIED) return true;
     _start = {x, y, z};
+    return false;
 }
 
 uint8_t Maze::getNode(int x, int y, int z)
@@ -145,12 +151,12 @@ bool Maze::checkFound(Pos p)
 void Maze::initBFS()
 {
     _found = false;
-    _bfs_search = _start;
+    _cur_search = _start;
     _bfs_queue = std::queue<Pos>();
 
     clearMazeSearch();
     setNode(_start.x, _start.y, _start.z, MAZE_CURRENT);
-    _bfs_queue.push(_bfs_search);
+    _bfs_queue.push(_cur_search);
 }
 
 void Maze::iterBFS()
@@ -166,10 +172,10 @@ void Maze::iterBFS()
     int z = next_node.z;
 
     // Clear last current
-    setNode(_bfs_search.x,_bfs_search.y,_bfs_search.z, MAZE_VISITED);
+    setNode(_cur_search.x,_cur_search.y,_cur_search.z, MAZE_VISITED);
     // Set new current
     setNode(x,y,z, MAZE_CURRENT|MAZE_VISITED);
-    _bfs_search = {x,y,z};
+    _cur_search = {x,y,z};
 
     // Fill queue with adjacent nodes
     for (int i = x-1 ; i <= x+1 ; ++i)
@@ -200,38 +206,67 @@ void Maze::tryInsertBFS(int x, int y, int z)
 //-------------------- A* --------------------//
 void Maze::initAstar()
 {
-    // Clear the pqueue
-    while (!_a_star_queue.empty())
-        _a_star_queue.pop();
-    _a_star_dist_from_start = 0;
+    _found = false;
+    _cur_search = _start;
+    _a_star_queue = std::priority_queue<Pos, std::vector<Pos>, AStarHeuristic>();
+
+    clearMazeSearch();
+    setNode(_start.x, _start.y, _start.z, MAZE_CURRENT);
+    _a_star_queue.push(_cur_search);
 }
 
 void Maze::iterAstar()
 {
     // Take from pqueue (check if empty and so on)
-    // check if we are in the target
-    // search distance is the Pos's distance +1
+    if(_a_star_queue.size() == 0)
+        return;
+
+    Pos next_node = _a_star_queue.top();
+    _a_star_queue.pop();
+
+    int x = next_node.x;
+    int y = next_node.y;
+    int z = next_node.z;
+
+    // Clear last current
+    setNode(_cur_search.x,_cur_search.y,_cur_search.z, MAZE_VISITED);
+    
+    // Set new current
+    setNode(x,y,z, MAZE_CURRENT|MAZE_VISITED);
+    _cur_search = {x,y,z};
+
     // insert nearby elements in the pqueue
+    insertAdjacentAStar(next_node);
+    checkFound(next_node);
+
+    // check if we are in the target
 }
 
-bool heuristicAStar(const Pos& a, const Pos& b)
+void Maze::insertAdjacentAStar(Pos a)
 {
-    // Use manhattan distance to specify the closest
-    int mnht_dist_a = 0;
-    mnht_dist_a += abs(a.x - _target.x);
-    mnht_dist_a += abs(a.y - _target.y);
-    mnht_dist_a += abs(a.z - _target.z);
+    int x = a.x;
+    int y = a.y;
+    int z = a.z;
 
-    int mnht_dist_b = 0;
-    mnht_dist_b += abs(b.x - _target.x);
-    mnht_dist_b += abs(b.y - _target.y);
-    mnht_dist_b += abs(b.z - _target.z);
+    // Fill pqueue with adjacent nodes
+    for (int i = x-1 ; i <= x+1 ; ++i)
+    for (int j = y-1 ; j <= y+1 ; ++j)
+    for (int k = z-1 ; k <= z+1 ; ++k)
+    {
+        if (!(getNode(i,j,k) & (MAZE_VISITED | MAZE_OCCUPIED)))
+	{
+	    // TODO: instead of simply push,
+	    // set heuristic values
+	    int mnht_dist = 0;
+	    mnht_dist += abs(i - _target.x);
+	    mnht_dist += abs(j - _target.y);
+	    mnht_dist += abs(k - _target.z);
 
-    // Priority queues return the greatest first,
-    // thus we need to invert the comparison operator
-    // to get the closest to the objective.
-    //TODO: implement g() heuristic (past)
-    if (mnht_dist_a < mnht_dist_b) return true;
-    return false;
+	    // G is the current G + 1
+	    // H is the manhattan distance
+	    _a_star_queue.push({x, y, z, mnht_dist, a.a_star_g + 1});
+	    setNode(i,j,k, MAZE_FRONTIER|MAZE_VISITED);
+	}
+    }
 }
 

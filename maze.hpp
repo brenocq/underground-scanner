@@ -14,10 +14,12 @@
 class Maze
 {
 public:
+
     struct Pos
     {
         int x, y, z;
-	//int a_star_dist; // TODO: add comparison
+        int a_star_h; // Manhattan distance to target
+        int a_star_g; // Distance walked from start
     };
 
     enum class Search {
@@ -37,9 +39,9 @@ public:
 
     //---------- Getters and setters ----------//
     Search getSearch() const { return _search; }
-    void setSearch(Search search) { _search = search; initSearch(); }
-    void setTarget(int x, int y, int z);
-    void setStart(int x, int y, int z);
+    void setSearch(Search search) { _search = search; }
+    bool setTarget(int x, int y, int z);
+    bool setStart(int x, int y, int z);
     Pos getStart() const { return _start; }
     Pos getTarget() const { return _target; }
     uint8_t getNode(int x, int y, int z);
@@ -55,6 +57,7 @@ private:
     // Set nodes as occupied
     void occupySphere(float radius, float x, float y, float z);
     void tryInsertBFS(int x, int y, int z);
+    void insertAdjacentAStar(Pos a);
     void clearMazeSearch();
 
     bool checkFound(Pos p);
@@ -63,11 +66,20 @@ private:
     bool _found;
     std::vector<uint8_t> _nodes;
     std::queue<Pos> _bfs_queue;
-    Pos _start, _target, _bfs_search;
+    Pos _start, _target, _cur_search;
 
-    static bool heuristicAStar(const Pos& a, const Pos& b);
+    struct AStarHeuristic
+    {
+    	bool operator()(const Pos& a, const Pos& b)
+	{
+	    // Reverse the comparision so the pqueue returns
+	    // the lowest value.
+	    return (a.a_star_g + a.a_star_h) < (b.a_star_g + b.a_star_h);
+	}
+    };
+
     int _a_star_dist_from_start;
-    //std::priority_queue<Pos, std::vector<Pos>, &heuristicAStar> _a_star_queue;
+    std::priority_queue<Pos, std::vector<Pos>, AStarHeuristic> _a_star_queue;
 };
 #endif
 

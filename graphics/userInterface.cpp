@@ -79,7 +79,7 @@ void UserInterface::mazeGeneration()
 
     ImGui::Text("Target position");
     bool targetChanged = false;
-    Maze::Pos target = _maze.getStart();
+    Maze::Pos target = _maze.getTarget();
     int targetX = target.x;
     int targetY = target.y;
     int targetZ = target.z;
@@ -90,12 +90,23 @@ void UserInterface::mazeGeneration()
     if(ImGui::Button("Regenerate"))
         _maze.generateMaze();
 
+    static bool rc;
     // Check if need to update start/goal positions
     if(startChanged || targetChanged)
     {
-        _maze.setStart(startX, startY, startZ);
-        _maze.setTarget(targetX, targetY, targetZ);
+        rc |= _maze.setStart(startX, startY, startZ);
+        rc |= _maze.setTarget(targetX, targetY, targetZ);
+
         _maze.initSearch();
+    }
+
+    if (rc)
+    {
+        static bool err_msg;
+        ImGui::Begin("Error", &err_msg);
+        ImGui::Text("Could not set Start/Target positions. Probably occupied.");
+        if (ImGui::Button("OK!")) rc = false;
+        ImGui::End();
     }
 
     // Resize and regenerate maze
@@ -137,7 +148,7 @@ void UserInterface::searchControl()
         float timeDiff = float(currTime-lastTime)/CLOCKS_PER_SEC;
         if(timeDiff > 0.1f)
         {
-	        _maze.iterSearch();
+	    _maze.iterSearch();
             lastTime = currTime;
         }
     }

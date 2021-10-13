@@ -26,6 +26,10 @@ Graphics::Graphics(Maze& maze):
 
 Graphics::~Graphics()
 {
+    delete _shader;
+    delete _maze_shader;
+    delete _ui;
+    
     glfwDestroyWindow(_window);
     glfwTerminate();
 }
