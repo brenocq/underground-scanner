@@ -12,7 +12,7 @@ public:
 private:
     void mazeGeneration();
     void searchControl();
-
+    
     Maze& _maze;
 };
 

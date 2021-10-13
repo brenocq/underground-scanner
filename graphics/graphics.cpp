@@ -26,6 +26,10 @@ Graphics::Graphics(Maze& maze):
 
 Graphics::~Graphics()
 {
+    delete _shader;
+    delete _maze_shader;
+    delete _ui;
+
     glfwDestroyWindow(_window);
     glfwTerminate();
 }
@@ -66,6 +70,7 @@ void Graphics::initGlfw()
 
     glfwSetWindowUserPointer(_window, this);
     glfwMakeContextCurrent(_window);
+    glfwSwapInterval(0);// Disable vsync
 
     //---------- Callbacks ----------//
     glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -109,45 +114,45 @@ void Graphics::initGlfw()
         });
 
     glfwSetScrollCallback(_window, [](GLFWwindow* window, double dx, double dy)
-    {
-        Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
+        {
+            Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
 
-        gptr->_camera.zoom(0.3f*dy);
-    });
+            gptr->_camera.zoom(0.3f*dy);
+        });
 
     glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, int button, int action, int mods)
-    {
-        Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
-        if(button == 2)
         {
-            if(action == GLFW_PRESS)
-                gptr->_moveWithMouse = true;
-            else if(action == GLFW_RELEASE)
-                gptr->_moveWithMouse = false;
-        }
-    });
+            Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
+            if(button == 2)
+            {
+                if(action == GLFW_PRESS)
+                    gptr->_moveWithMouse = true;
+                else if(action == GLFW_RELEASE)
+                    gptr->_moveWithMouse = false;
+            }
+        });
 
     glfwSetCursorPosCallback(_window, [](GLFWwindow* window, double xPos, double yPos)
-    {
-        static double lastX = -1;
-        static double lastY = -1;
-        if(lastX == -1) lastX = xPos;
-        if(lastY == -1) lastY = yPos;
-        Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
-
-        // Calculate displacement
-        float dx = xPos - lastX;
-        float dy = yPos - lastY;
-        lastX = xPos;
-        lastY = yPos;
-
-        // Update camera position
-        if(gptr->_moveWithMouse)
         {
-            gptr->_camera.rotateDirection(0.01f*dx, false);// Theta
-            gptr->_camera.rotateDirection(0.01f*dy, true);// Phi
-        }
-    });
+            static double lastX = -1;
+            static double lastY = -1;
+            if(lastX == -1) lastX = xPos;
+            if(lastY == -1) lastY = yPos;
+            Graphics *gptr = (Graphics*) glfwGetWindowUserPointer(window);
+
+            // Calculate displacement
+            float dx = xPos - lastX;
+            float dy = yPos - lastY;
+            lastX = xPos;
+            lastY = yPos;
+
+            // Update camera position
+            if(gptr->_moveWithMouse)
+            {
+                gptr->_camera.rotateDirection(0.01f*dx, false);// Theta
+                gptr->_camera.rotateDirection(0.01f*dy, true);// Phi
+            }
+        });
 }
 
 void Graphics::initOpenGL()
@@ -249,8 +254,8 @@ void Graphics::createVAOs()
     glEnableVertexAttribArray(0);
 
     // Unbind objects
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-    glBindVertexArray(0); 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void Graphics::render()
@@ -279,15 +284,22 @@ void Graphics::render()
             for (uint32_t x = 0 ; x < _maze.size; x++)
             {
                 uint8_t a_node = _maze.getNode(x, y, z);
-                if(a_node == 0)
-                    continue;
 
                 glm::vec4 color = glm::vec4(0.0, 0.0, 0.0, 0.0);
 
-
                 // Set color uniform based on vertex info
-                if(a_node & MAZE_OCCUPIED) 
+                if(a_node & MAZE_OCCUPIED)
                     color = glm::vec4(x/(float)_maze.size, y/(float)_maze.size, z/(float)_maze.size, 1.0);
+                else if(a_node & MAZE_CURRENT) // Scarlet the passion, the color of my heart
+                    color = glm::vec4(1.0, 0.14, 0.0, 1.0);
+                else if(a_node & MAZE_FRONTIER)
+                    //continue;
+                    color = glm::vec4(1.0, 1.0, 0.0, 0.3);
+                else if(a_node & MAZE_VISITED)
+                    color = glm::vec4(0.0, 0.0, 0.0, 1.0);
+                else
+                    continue;
+
 
                 _maze_shader->setUniformV4("color", color);
 

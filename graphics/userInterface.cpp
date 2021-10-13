@@ -5,6 +5,8 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_internal.h>
+// Time for search animation
+#include <ctime>
 
 UserInterface::UserInterface(Maze& maze):
     _maze(maze)
@@ -64,51 +66,98 @@ void UserInterface::mazeGeneration()
     ImGui::Text("Maze generation");
     ImGui::Spacing();
     bool sizeChanged = ImGui::DragInt("Size", &mazeSize, 0.5f, 2, 100, "%d");
+
     ImGui::Text("Start position");
-    static int startX = 0, startY = 0, startZ = 0;
-    ImGui::DragInt("X##StartX", &startX, 0.5f, 0, mazeSize-1, "%d");
-    ImGui::DragInt("Y##StartY", &startY, 0.5f, 0, mazeSize-1, "%d");
-    ImGui::DragInt("Z##StartZ", &startZ, 0.5f, 0, mazeSize-1, "%d");
-    ImGui::Text("Goal position");
-    static int goalX = mazeSize-1, goalY = mazeSize-1, goalZ = mazeSize-1;
-    ImGui::DragInt("X##GoalX", &goalX, 0.5f, 0, mazeSize-1, "%d");
-    ImGui::DragInt("Y##GoalY", &goalY, 0.5f, 0, mazeSize-1, "%d");
-    ImGui::DragInt("Z##GoalZ", &goalZ, 0.5f, 0, mazeSize-1, "%d");
+    bool startChanged = false;
+    Maze::Pos start = _maze.getStart();
+    int startX = start.x;
+    int startY = start.y;
+    int startZ = start.z;
+    startChanged |= ImGui::DragInt("X##StartX", &startX, 0.5f, 0, mazeSize-1, "%d");
+    startChanged |= ImGui::DragInt("Y##StartY", &startY, 0.5f, 0, mazeSize-1, "%d");
+    startChanged |= ImGui::DragInt("Z##StartZ", &startZ, 0.5f, 0, mazeSize-1, "%d");
+
+    ImGui::Text("Target position");
+    bool targetChanged = false;
+    Maze::Pos target = _maze.getTarget();
+    int targetX = target.x;
+    int targetY = target.y;
+    int targetZ = target.z;
+    targetChanged |= ImGui::DragInt("X##TargetX", &targetX, 0.5f, 0, mazeSize-1, "%d");
+    targetChanged |= ImGui::DragInt("Y##TargetY", &targetY, 0.5f, 0, mazeSize-1, "%d");
+    targetChanged |= ImGui::DragInt("Z##TargetZ", &targetZ, 0.5f, 0, mazeSize-1, "%d");
+
     if(ImGui::Button("Regenerate"))
         _maze.generateMaze();
 
+    static bool rc;
     // Check if need to update start/goal positions
-    if(sizeChanged)
+    if(startChanged || targetChanged)
     {
-        if(startX >= mazeSize)
-            startX = mazeSize-1;
-        if(startY >= mazeSize)
-            startY = mazeSize-1;
-        if(startZ >= mazeSize)
-            startZ = mazeSize-1;
+        rc |= _maze.setStart(startX, startY, startZ);
+        rc |= _maze.setTarget(targetX, targetY, targetZ);
 
-        if(goalX >= mazeSize)
-            goalX = mazeSize-1;
-        if(goalY >= mazeSize)
-            goalY = mazeSize-1;
-        if(goalZ >= mazeSize)
-            goalZ = mazeSize-1;
-
-        _maze.resize(mazeSize);
+        _maze.initSearch();
     }
+
+    if (rc)
+    {
+        static bool err_msg;
+        ImGui::Begin("Error", &err_msg);
+        ImGui::Text("Could not set Start/Target positions. Probably occupied.");
+        if (ImGui::Button("OK!")) rc = false;
+        ImGui::End();
+    }
+
+    // Resize and regenerate maze
+    if(sizeChanged)
+        _maze.resize(mazeSize);
 }
 
 void UserInterface::searchControl()
 {
+    static bool play = false;
     ImGui::Text("Search control");
 
     // Select search combo box
-    const char* typesOfSearch[] = { "Unguided search", "A* (Guided search)" };
-    int selected = 0;
-    ImGui::Combo("Type", &selected, typesOfSearch, IM_ARRAYSIZE(typesOfSearch));
+    const char* typesOfSearch[] = { "BFS (Blind search)", "A* (Guided search)" };
+    static int selected = -1;
+
+    if (ImGui::Combo("Type", &selected, typesOfSearch, IM_ARRAYSIZE(typesOfSearch)))
+    {
+        switch (selected)
+        {
+	    case 0: _maze.setSearch(Maze::Search::BFS); break;
+	    case 1: _maze.setSearch(Maze::Search::ASTAR); break;
+        }
+    }
 
     // Buttons
-    ImGui::Button("Reset");
+    if(ImGui::Button("Reset"))
+        _maze.initSearch();
+    
     ImGui::SameLine();
-    ImGui::Button("Advance");
+    if(ImGui::Button("Play"))
+        play = true;
+
+    ImGui::SameLine();
+    if(ImGui::Button("Stop"))
+        play = false;
+
+    ImGui::SameLine();
+    if(ImGui::Button("Next"))
+	    _maze.iterSearch();
+
+    if(play)
+    {
+        // Execute graphics update every X seconds
+        static clock_t lastTime = std::clock();
+        const clock_t currTime = std::clock();
+        float timeDiff = float(currTime-lastTime)/CLOCKS_PER_SEC;
+        if(timeDiff > 0.1f)
+        {
+	    _maze.iterSearch();
+            lastTime = currTime;
+        }
+    }
 }

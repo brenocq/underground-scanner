@@ -3,7 +3,7 @@
 
 int main()
 {
-        Maze maze(7);
+    Maze maze(10);
 	Graphics gfx(maze);
 	gfx.run();
 
