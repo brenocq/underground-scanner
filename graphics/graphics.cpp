@@ -29,7 +29,7 @@ Graphics::~Graphics()
     delete _shader;
     delete _maze_shader;
     delete _ui;
-    
+
     glfwDestroyWindow(_window);
     glfwTerminate();
 }
@@ -254,8 +254,8 @@ void Graphics::createVAOs()
     glEnableVertexAttribArray(0);
 
     // Unbind objects
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-    glBindVertexArray(0); 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void Graphics::render()
@@ -293,8 +293,8 @@ void Graphics::render()
                 else if(a_node & MAZE_CURRENT) // Scarlet the passion, the color of my heart
                     color = glm::vec4(1.0, 0.14, 0.0, 1.0);
                 else if(a_node & MAZE_FRONTIER)
-                    continue;
-                    //color = glm::vec4(1.0, 1.0, 1.0, 1.0);
+                    //continue;
+                    color = glm::vec4(1.0, 1.0, 0.0, 0.3);
                 else if(a_node & MAZE_VISITED)
                     color = glm::vec4(0.0, 0.0, 0.0, 1.0);
                 else
