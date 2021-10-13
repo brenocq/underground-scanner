@@ -74,7 +74,7 @@ private:
 	{
 	    // Reverse the comparision so the pqueue returns
 	    // the lowest value.
-	    return (a.a_star_g + a.a_star_h) < (b.a_star_g + b.a_star_h);
+	    return (a.a_star_g + a.a_star_h) > (b.a_star_g + b.a_star_h);
 	}
     };
 

@@ -121,8 +121,16 @@ void UserInterface::searchControl()
 
     // Select search combo box
     const char* typesOfSearch[] = { "BFS (Blind search)", "A* (Guided search)" };
-    static int selected = 0;
-    ImGui::Combo("Type", &selected, typesOfSearch, IM_ARRAYSIZE(typesOfSearch));
+    static int selected = -1;
+
+    if (ImGui::Combo("Type", &selected, typesOfSearch, IM_ARRAYSIZE(typesOfSearch)))
+    {
+        switch (selected)
+        {
+	    case 0: _maze.setSearch(Maze::Search::BFS); break;
+	    case 1: _maze.setSearch(Maze::Search::ASTAR); break;
+        }
+    }
 
     // Buttons
     if(ImGui::Button("Reset"))

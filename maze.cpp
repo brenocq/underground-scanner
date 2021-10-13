@@ -200,7 +200,6 @@ void Maze::tryInsertBFS(int x, int y, int z)
             _bfs_queue.push({x, y, z});
         }
     }
-
 }
 
 //-------------------- A* --------------------//
@@ -222,6 +221,8 @@ void Maze::iterAstar()
         return;
 
     Pos next_node = _a_star_queue.top();
+
+    printf("Next node was %d %d %d\n", next_node.x, next_node.y, next_node.z);
     _a_star_queue.pop();
 
     int x = next_node.x;
@@ -253,7 +254,11 @@ void Maze::insertAdjacentAStar(Pos a)
     for (int j = y-1 ; j <= y+1 ; ++j)
     for (int k = z-1 ; k <= z+1 ; ++k)
     {
-        if (!(getNode(i,j,k) & (MAZE_VISITED | MAZE_OCCUPIED)))
+	// Check bounds
+	if (i >= 0 && i < size &&
+    	    j >= 0 && j < size &&
+    	    k >= 0 && k < size &&
+	    !(getNode(i,j,k) & (MAZE_VISITED | MAZE_OCCUPIED)))
 	{
 	    // TODO: instead of simply push,
 	    // set heuristic values
@@ -264,7 +269,7 @@ void Maze::insertAdjacentAStar(Pos a)
 
 	    // G is the current G + 1
 	    // H is the manhattan distance
-	    _a_star_queue.push({x, y, z, mnht_dist, a.a_star_g + 1});
+	    _a_star_queue.push({i, j, k, mnht_dist, a.a_star_g + 1});
 	    setNode(i,j,k, MAZE_FRONTIER|MAZE_VISITED);
 	}
     }
