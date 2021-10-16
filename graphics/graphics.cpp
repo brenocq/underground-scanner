@@ -13,7 +13,7 @@ Graphics::Graphics(Maze& maze):
 
     _shader = new Shader("graphics/shaders/shader.vert", "graphics/shaders/shader.frag");
     _maze_shader = new Shader("graphics/shaders/maze_shader.vert", "graphics/shaders/shader.frag");
-    _ui = new UserInterface(_maze);
+    _ui = new UserInterface(_maze, _camera);
 
     //_lines.push_back({{0,0,0}, {1,1,1}});
     //_lines.push_back({{1,1,1}, {1,1,0}});
@@ -286,31 +286,50 @@ void Graphics::render()
                 uint8_t a_node = _maze.getNode(x, y, z);
 
                 glm::vec4 color = glm::vec4(0.0, 0.0, 0.0, 0.0);
+                float scale = 1.0f;
 
                 // Set color uniform based on vertex info
                 if(a_node & MAZE_OCCUPIED)
-                    color = glm::vec4(x/(float)_maze.size, y/(float)_maze.size, z/(float)_maze.size, 1.0);
+                    color = glm::vec4(x*0.7f/(float)_maze.size, y*0.7f/(float)_maze.size, z*0.7f/(float)_maze.size, 1.0);
                 else if(a_node & MAZE_CURRENT) // Scarlet the passion, the color of my heart
+                {
                     color = glm::vec4(1.0, 0.14, 0.0, 1.0);
+                    scale = 0.8f;
+                }
                 else if(a_node & MAZE_FRONTIER)
-                    //continue;
+                {
                     color = glm::vec4(1.0, 1.0, 0.0, 0.3);
+                    scale = 0.3f;
+                }
                 else if(a_node & MAZE_VISITED)
-                    color = glm::vec4(0.0, 0.0, 0.0, 1.0);
+                {
+                    color = glm::vec4(0.4, 0.4, 0.4, 0.3);
+                    scale = 0.2f;
+                }
                 else
                     continue;
 
-
+                // Set color
                 _maze_shader->setUniformV4("color", color);
 
                 // Set model matrix
                 glm::mat4 model = glm::mat4(1.0);
                 float offset = _maze.size*0.5f;
                 model = glm::translate(model, glm::vec3((float)x-offset, (float)y-offset, (float)z-offset));
+                model = glm::scale(model, glm::vec3(scale, scale, scale));
                 _maze_shader->setUniformM4("model", model);
 
                 // Draw points
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
-}
 
+    // Render target
+    _maze_shader->setUniformV4("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    Maze::Pos target = _maze.getTarget();
+    glm::mat4 model = glm::mat4(1.0);
+    float offset = _maze.size*0.5f;
+    model = glm::translate(model, glm::vec3((float)target.x-offset, (float)target.y-offset, (float)target.z-offset));
+    model = glm::scale(model, glm::vec3(0.8f, 0.8f, 0.8f));
+    _maze_shader->setUniformM4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+}

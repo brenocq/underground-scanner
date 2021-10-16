@@ -1,7 +1,7 @@
 CC = g++
 INCLUDE = -I. -I./extern/ 
 LIBS = -lglfw -lGL -lX11 -lXrandr -lXi -ldl 
-FLAGS = -g -Wall -fsanitize=address
+FLAGS = -g
 # Text style
 RED    = \033[0;31m
 GREEN  = \033[0;32m

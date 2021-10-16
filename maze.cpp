@@ -6,7 +6,8 @@
 #include <vector>
 
 Maze::Maze(unsigned size_):
-    size(size_), _search(Search::BFS), _start({0,0,0}), _target({size_-1,size_-1,size_-1})
+    size(size_), _search(Search::BFS), _start({0,0,0}), _target({size_-1,size_-1,size_-1}),
+    _iteration(0), _numVisited(0), _numFrontier(0)
 {
     resize(size);
     initSearch();
@@ -24,6 +25,12 @@ bool Maze::setStart(int x, int y, int z)
     if (_nodes[x + y * size + z * (size * size)] & MAZE_OCCUPIED) return true;
     _start = {x, y, z};
     return false;
+}
+
+void Maze::setSearch(Search search)
+{ 
+    _search = search;
+    initSearch();
 }
 
 uint8_t Maze::getNode(int x, int y, int z)
@@ -120,6 +127,7 @@ void Maze::initSearch()
         default:
             std::cout << "[Maze] Unknown search when trying to initialize" << std::endl;
     }
+    _iteration = 0;
 }
 
 void Maze::iterSearch()
@@ -136,6 +144,8 @@ void Maze::iterSearch()
         default:
             std::cout << "[Maze] Unknown search when trying to iterate search" << std::endl;
     }
+    _iteration++;
+    updateNumFrontierVisible();
 }
 
 bool Maze::checkFound(Pos p)
@@ -222,7 +232,6 @@ void Maze::iterAstar()
 
     Pos next_node = _a_star_queue.top();
 
-    printf("Next node was %d %d %d\n", next_node.x, next_node.y, next_node.z);
     _a_star_queue.pop();
 
     int x = next_node.x;
@@ -230,48 +239,60 @@ void Maze::iterAstar()
     int z = next_node.z;
 
     // Clear last current
-    setNode(_cur_search.x,_cur_search.y,_cur_search.z, MAZE_VISITED);
+    setNode(_cur_search.x, _cur_search.y, _cur_search.z, MAZE_VISITED);
     
     // Set new current
     setNode(x,y,z, MAZE_CURRENT|MAZE_VISITED);
     _cur_search = {x,y,z};
 
     // insert nearby elements in the pqueue
-    insertAdjacentAStar(next_node);
+    for (int i = x-1 ; i <= x+1 ; ++i)
+        for (int j = y-1 ; j <= y+1 ; ++j)
+            for (int k = z-1 ; k <= z+1 ; ++k)
+                tryInsertAStar(next_node, {i, j, k, 0, next_node.a_star_g });
     checkFound(next_node);
 
     // check if we are in the target
 }
 
-void Maze::insertAdjacentAStar(Pos a)
+void Maze::tryInsertAStar(Pos last, Pos a)
 {
-    int x = a.x;
-    int y = a.y;
-    int z = a.z;
+    int x = a.x, y = a.y, z = a.z;
 
-    // Fill pqueue with adjacent nodes
-    for (int i = x-1 ; i <= x+1 ; ++i)
-    for (int j = y-1 ; j <= y+1 ; ++j)
-    for (int k = z-1 ; k <= z+1 ; ++k)
-    {
 	// Check bounds
-	if (i >= 0 && i < size &&
-    	    j >= 0 && j < size &&
-    	    k >= 0 && k < size &&
-	    !(getNode(i,j,k) & (MAZE_VISITED | MAZE_OCCUPIED)))
+	if (x >= 0 && x < size &&
+    	    y >= 0 && y < size &&
+    	    z >= 0 && z < size &&
+	    !(getNode(x,y,z) & (MAZE_VISITED | MAZE_OCCUPIED)))
 	{
-	    // TODO: instead of simply push,
-	    // set heuristic values
-	    int mnht_dist = 0;
-	    mnht_dist += abs(i - _target.x);
-	    mnht_dist += abs(j - _target.y);
-	    mnht_dist += abs(k - _target.z);
+        // Calculate distance to target
+	    float dx = x - _target.x;
+	    float dy = y - _target.y;
+	    float dz = z - _target.z;
+        float distTarget = dx*dx + dy*dy + dz*dz;
+
+        // Calculate distance between nodes
+        dx = x - last.x;
+        dy = y - last.y;
+        dz = z - last.z;
+        float distLast = dx*dx + dy*dy + dz*dz;
 
 	    // G is the current G + 1
 	    // H is the manhattan distance
-	    _a_star_queue.push({i, j, k, mnht_dist, a.a_star_g + 1});
-	    setNode(i,j,k, MAZE_FRONTIER|MAZE_VISITED);
+	    _a_star_queue.push({x, y, z, distTarget, a.a_star_g + distLast});
+	    setNode(x,y,z, MAZE_FRONTIER | MAZE_VISITED);
 	}
-    }
 }
 
+void Maze::updateNumFrontierVisible()
+{
+    _numVisited = 0;
+    _numFrontier = 0;
+    for(uint8_t node : _nodes)
+    {
+       if(node & MAZE_FRONTIER) 
+           _numFrontier++;
+       else if(node & MAZE_VISITED) 
+           _numVisited++;
+    }
+}

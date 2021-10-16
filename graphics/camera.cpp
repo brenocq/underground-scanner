@@ -5,9 +5,10 @@
 #include <glm/geometric.hpp>
 
 #include <stdio.h>
+#include <iostream>
 
 Camera::Camera():
-    rho(15), phi(glm::radians(45.0f)), theta(0)
+    rho(60), phi(glm::radians(45.0f)), theta(glm::radians(270.0f))
 {
 
 }
