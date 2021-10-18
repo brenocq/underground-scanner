@@ -1,6 +1,6 @@
 CC = g++
-INCLUDE = -I. -I./extern/ 
-LIBS = -lglfw -lGL -lX11 -lXrandr -lXi -ldl 
+INCLUDE = -I. -I./extern/ --std=c++17
+LIBS = -lglfw -lGL -lX11 -lXrandr -ldl -lstdc++fs
 FLAGS = -g
 # Text style
 RED    = \033[0;31m

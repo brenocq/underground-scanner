@@ -1,9 +1,9 @@
 #ifndef __SHADER
 #define __SHADER
-#include "glad/glad.h"
+#include <glad/glad.h>
 #include <filesystem>
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
 namespace fs = std::filesystem;
 

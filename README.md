@@ -6,7 +6,7 @@ Implementation of A* and BFS to find minimum distance between two points on 3d g
 ### Ubuntu
 ```
 sudo apt-get update
-sudo apt-get install mesa-utils libglfw3-dev
+sudo apt-get install mesa-utils libglfw3-dev libglm-dev
 ```
 ### Arch
 ```
