@@ -15,16 +15,16 @@ Maze::Maze(unsigned size_):
 
 bool Maze::setTarget(int x, int y, int z)
 {
-    if (_nodes[x + y * size + z * (size * size)] & MAZE_OCCUPIED) return true;
+    if (_nodes[x + y * size + z * (size * size)] & MAZE_OCCUPIED) return false;
     _target = {x, y, z};
-    return false;
+    return true;
 }
 
 bool Maze::setStart(int x, int y, int z)
 {
-    if (_nodes[x + y * size + z * (size * size)] & MAZE_OCCUPIED) return true;
+    if (_nodes[x + y * size + z * (size * size)] & MAZE_OCCUPIED) return false;
     _start = {x, y, z};
-    return false;
+    return true;
 }
 
 void Maze::setSearch(Search search)
@@ -278,7 +278,7 @@ void Maze::tryInsertAStar(Pos last, Pos a)
         float distLast = dx*dx + dy*dy + dz*dz;
 
 	    // G is the current G + 1
-	    // H is the manhattan distance
+	    // H is the euclidian distance
 	    _a_star_queue.push({x, y, z, distTarget, a.a_star_g + distLast});
 	    setNode(x,y,z, MAZE_FRONTIER | MAZE_VISITED);
 	}

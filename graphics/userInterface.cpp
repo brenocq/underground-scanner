@@ -114,17 +114,17 @@ void UserInterface::mazeGeneration()
     if(ImGui::Button("Regenerate"))
         _maze.generateMaze();
 
-    static bool rc;
+    static bool rc = true;
     // Check if need to update start/goal positions
     if(startChanged || targetChanged)
     {
-        rc |= _maze.setStart(startX, startY, startZ);
-        rc |= _maze.setTarget(targetX, targetY, targetZ);
+        rc &= _maze.setStart(startX, startY, startZ);
+        rc &= _maze.setTarget(targetX, targetY, targetZ);
 
         _maze.initSearch();
     }
 
-    if (rc)
+    if(!rc)
     {
         static bool err_msg;
         ImGui::Begin("Error", &err_msg);

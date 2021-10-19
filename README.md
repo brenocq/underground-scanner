@@ -3,14 +3,15 @@
 Implementation of A* and BFS to find minimum distance between two points on 3d grid.
 
 ## Installation
+
 ### Ubuntu
 ```
 sudo apt-get update
-sudo apt-get install mesa-utils libglfw3-dev
+sudo apt-get install mesa-utils libglfw3-dev libglm-dev
 ```
 ### Arch
 ```
-sudo pacman -Sy glfw-x11 
+sudo pacman -Sy glfw-x11 glm
 ```
 
 ## Running
